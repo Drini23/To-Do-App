@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="sidebar.css">
+<style>
+    /* Reset some default styles for ul and li */
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    /* Style the sidebar */
+    .sidebar {
+        height: 100%;
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #333;
+        overflow-x: hidden;
+        padding-top: 20px;
+    }
+    
+    /* Style the sidebar header */
+    .sidebar h2 {
+        color: #fff;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    /* Style the sidebar links */
+    .sidebar ul {
+        text-align: center;
+    }
+    
+    .sidebar a {
+        text-decoration: none;
+        color: #fff;
+        display: block;
+        padding: 10px;
+        font-size: 18px;
+        transition: 0.3s;
+    }
+    
+    .sidebar a:hover {
+        background-color: #00f;
+        color: #fff;
+    }
+    
+    /* Style the main content area (adjust the padding to avoid overlapping with the sidebar) */
+    .content {
+        margin-left: 250px;
+        padding: 20px;
+    }
+    
+</style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Your To-Do List</h2>
+        <ul>
+            {% if request.user.is_authenticated %}
+                <h2>Welcome {{request.user}}</h2>  
+            {% endif %}
+        </ul>
+        <ul>
+            <li><a href="{% url 'list' %}">Home</a></li>
+            <li><a href="{% url 'about' %}">About</a></li>
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'logout' %}">Logout</a>
+            {% else %}    
+            <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+            
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </div>
+</body>
+</html>
