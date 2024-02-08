@@ -143,3 +143,4 @@ CSRF_COOKIE_SECURE = True
 
 # settings.py
 CSRF_COOKIE_SAMESITE = 'None'
+CSRF_TRUSTED_ORIGINS=['https://web-production-a4ec.up.railway.app/']
