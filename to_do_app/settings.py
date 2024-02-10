@@ -139,7 +139,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # settings.py
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = True
 
 # settings.py
 CSRF_COOKIE_SAMESITE = 'None'
