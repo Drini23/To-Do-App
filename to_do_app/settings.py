@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-0_2k08f1kyu5(&y@=r27ztnjtsh_(r43^-zvqyn@wd(cr@6qyx'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -139,8 +139,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # settings.py
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
 
 # settings.py
 CSRF_COOKIE_SAMESITE = 'None'
-CSRF_TRUSTED_ORIGINS=['https://web-production-a4ec.up.railway.app/']
+CSRF_TRUSTED_ORIGINS=['https://web-production-a4ec.up.railway.app']
