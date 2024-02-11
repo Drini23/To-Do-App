@@ -20,8 +20,8 @@ class TaskViewSet(ModelViewSet):
     
     def get_permissions(self):
         if self.request.method == 'GET':
-            return[AllowAny()]
-        return[IsAuthenticated()]
+            return[IsAuthenticated()]
+        return[IsAdminUser()]
 
     def get_serializer_context(self):
         return {'request': self.request}
