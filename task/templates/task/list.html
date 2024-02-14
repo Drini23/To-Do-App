@@ -48,12 +48,13 @@
 <body>
     <div class="container">
         <h3 class="mt-3">To-Do List</h3>
-        <form method="POST" action="/">
+        <form method="POST" action="">
             {% csrf_token %}
+            {% if request.user.is_authenticated %}
             <div class="input-group mt-3">
                 {{form.title}}
                 <div class="input-group-append">
-                    {% if request.user.is_authenticated %}
+        
                     <button type="submit" class="btn btn-primary" name="Create Task">Create Task</button>
                     {% endif %}
                 </div>
