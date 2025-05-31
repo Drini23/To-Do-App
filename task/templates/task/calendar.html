@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+{% include "navbar.html" %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar | Nexus Tasks</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: var(--dark);
+        }
+        
+        .calendar-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .calendar-title {
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 0;
+        }
+        
+        .view-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .view-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .view-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .view-btn:hover {
+            background: #f1f5f9;
+        }
+        
+        /* FullCalendar customization */
+        .fc {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 1rem;
+        }
+        
+        .fc-toolbar-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .fc-button {
+            background: white !important;
+            border: 1px solid #e2e8f0 !important;
+            color: var(--dark) !important;
+            font-weight: 500 !important;
+            text-transform: capitalize !important;
+        }
+        
+        .fc-button-primary:not(:disabled).fc-button-active {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+        }
+        
+        .fc-daygrid-day-number {
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .fc-day-today {
+            background-color: rgba(99, 102, 241, 0.1) !important;
+        }
+        
+        .fc-event {
+            background: var(--primary) !important;
+            border: none !important;
+            padding: 2px 4px !important;
+            font-size: 0.85rem !important;
+            border-radius: 4px !important;
+        }
+        
+        .fc-event-title {
+            white-space: normal !important;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .calendar-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .view-options {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .view-btn {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .fc-toolbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .fc-header-toolbar .fc-toolbar-chunk {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <h1 class="calendar-title">
+                <i class="fas fa-calendar-alt me-2"></i>
+                Task Calendar
+            </h1>
+            <div class="view-options">
+                <button class="view-btn active" id="month-view">Month</button>
+                <button class="view-btn" id="week-view">Week</button>
+                <button class="view-btn" id="day-view">Day</button>
+                <button class="view-btn" id="list-view">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="calendar"></div>
+    </div>
+    
+    <!-- Modal for task details -->
+    <div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskModalTitle">Task Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="taskModalBody">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Edit Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize calendar
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                views: {
+                    listWeek: {
+                        type: 'listWeek',
+                        duration: { weeks: 2 },
+                        buttonText: 'List'
+                    }
+                },
+                events: [
+                    // This would be populated from your Django backend
+                    // Example:
+                    {
+                        title: 'Team Meeting',
+                        start: new Date(),
+                        extendedProps: {
+                            description: 'Weekly team sync',
+                            priority: 'high'
+                        }
+                    }
+                ],
+                eventClick: function(info) {
+                    const taskModal = new bootstrap.Modal(document.getElementById('taskModal'));
+                    document.getElementById('taskModalTitle').textContent = info.event.title;
+                    
+                    let modalBody = `
+                        <p><strong>Date:</strong> ${info.event.start.toLocaleString()}</p>
+                        <p><strong>Description:</strong> ${info.event.extendedProps.description || 'No description'}</p>
+                        <p><strong>Priority:</strong> <span class="badge bg-${info.event.extendedProps.priority === 'high' ? 'danger' : 'primary'}">
+                            ${info.event.extendedProps.priority || 'normal'}
+                        </span></p>
+                    `;
+                    
+                    document.getElementById('taskModalBody').innerHTML = modalBody;
+                    taskModal.show();
+                },
+                dateClick: function(info) {
+                    // Handle date click (could open a form to add new task)
+                    console.log('Clicked on: ' + info.dateStr);
+                },
+                eventDisplay: 'block',
+                eventTimeFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    meridiem: 'short'
+                }
+            });
+            
+            calendar.render();
+            
+            // View toggle buttons
+            document.getElementById('month-view').addEventListener('click', function() {
+                calendar.changeView('dayGridMonth');
+                updateActiveButton('month-view');
+            });
+            
+            document.getElementById('week-view').addEventListener('click', function() {
+                calendar.changeView('timeGridWeek');
+                updateActiveButton('week-view');
+            });
+            
+            document.getElementById('day-view').addEventListener('click', function() {
+                calendar.changeView('timeGridDay');
+                updateActiveButton('day-view');
+            });
+            
+            document.getElementById('list-view').addEventListener('click', function() {
+                calendar.changeView('listWeek');
+                updateActiveButton('list-view');
+            });
+            
+            function updateActiveButton(activeId) {
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(activeId).classList.add('active');
+            }
+            
+            // Load tasks from your Django backend
+            function loadTasks() {
+                fetch('/api/tasks/')  // Replace with your actual endpoint
+                    .then(response => response.json())
+                    .then(tasks => {
+                        const events = tasks.map(task => ({
+                            title: task.title,
+                            start: task.due_date,
+                            extendedProps: {
+                                description: task.description,
+                                priority: task.priority,
+                                completed: task.completed
+                            },
+                            color: task.completed ? '#10b981' : '#6366f1'
+                        }));
+                        calendar.removeAllEvents();
+                        calendar.addEventSource(events);
+                    });
+            }
+            
+            // Initial load
+            loadTasks();
+        });
+    </script>
+</body>
+</html>

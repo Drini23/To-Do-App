@@ -22,6 +22,7 @@
             --sidebar-active: rgba(99, 102, 241, 0.3);
             --sidebar-divider: rgba(255, 255, 255, 0.1);
             --user-bg: rgba(255, 255, 255, 0.1);
+            --mobile-breakpoint: 768px;
         }
         
         * {
@@ -33,6 +34,25 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
+            transition: margin-left 0.3s ease;
+        }
+        
+        /* Mobile toggle button */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: var(--sidebar-accent);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
         .sidebar {
@@ -48,8 +68,8 @@
             flex-direction: column;
             z-index: 1000;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            overflow: hidden;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
         }
         
         .sidebar-header {
@@ -63,6 +83,8 @@
             align-items: center;
             gap: 0.75rem;
             margin-bottom: 2rem;
+            text-decoration: none;
+            color: inherit;
         }
         
         .app-icon {
@@ -84,6 +106,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 700;
             font-size: 1.25rem;
+            transition: opacity 0.3s;
         }
         
         .user-info {
@@ -171,7 +194,6 @@
         
         .nav-link:hover {
             background: var(--sidebar-hover);
-            transform: translateX(5px);
         }
         
         .nav-link.active {
@@ -208,75 +230,71 @@
             color: #ef4444;
         }
         
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+        
         /* Mobile responsive */
         @media (max-width: 768px) {
+            .mobile-nav-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
             .sidebar {
-                width: 80px;
-                padding: 1rem 0;
-                overflow: visible;
-            }
-            
-            .app-name, .user-details, .nav-title, .nav-link span {
-                display: none;
-            }
-            
-            .app-logo {
-                justify-content: center;
-                margin-bottom: 1.5rem;
-            }
-            
-            .user-info {
-                justify-content: center;
-                padding: 0.5rem;
-            }
-            
-            .user-avatar {
-                width: 32px;
-                height: 32px;
-                font-size: 0.8rem;
-            }
-            
-            .nav-link {
-                justify-content: center;
-                padding: 0.75rem;
-            }
-            
-            .nav-link:hover {
-                transform: scale(1.1);
-            }
-            
-            .sidebar:hover {
+                transform: translateX(-100%);
                 width: 280px;
             }
             
-            .sidebar:hover .app-name,
-            .sidebar:hover .user-details,
-            .sidebar:hover .nav-title,
-            .sidebar:hover .nav-link span {
-                display: block;
+            .sidebar.active {
+                transform: translateX(0);
             }
             
-            .sidebar:hover .app-logo,
-            .sidebar:hover .user-info,
-            .sidebar:hover .nav-link {
-                justify-content: flex-start;
+            .main-content {
+                margin-left: 0;
             }
             
-            .sidebar:hover .nav-link {
-                padding: 0.75rem 1rem;
+            /* Prevent scrolling when sidebar is open */
+            body.sidebar-open {
+                overflow: hidden;
+            }
+        }
+        
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                max-width: 320px;
+            }
+            
+            .mobile-nav-toggle {
+                top: 15px;
+                left: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.25rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" id="mobileNavToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="app-logo">
+            <a href="{% url 'list' %}" class="app-logo">
                 <div class="app-icon">
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <div class="app-name">Nexus Tasks</div>
-            </div>
+            </a>
             
             {% if request.user.is_authenticated %}
             <div class="user-info">
@@ -295,19 +313,19 @@
             <div class="nav-title">Navigation</div>
             <ul>
                 <li class="nav-item">
-                    <a href="{% url 'list' %}" class="nav-link active">
+                    <a href="{% url 'list' %}" class="nav-link {% if request.path == '/list/' %}active{% endif %}">
                         <i class="fas fa-home"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'about' %}" class="nav-link">
+                    <a href="{% url 'about' %}" class="nav-link {% if request.path == '/about/' %}active{% endif %}">
                         <i class="fas fa-info-circle"></i>
                         <span>About</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link {% if request.path == '/calendar/' %}active{% endif %}">
                         <i class="fas fa-calendar-alt"></i>
                         <span>Calendar</span>
                     </a>
@@ -356,34 +374,66 @@
                 </button>
             {% endif %}
         </div>
-    </div>
+    </nav>
 
-    <!-- Content area would start here -->
-    <div style="margin-left: 280px; padding: 2rem;">
-        <!-- Your main content goes here -->
+    <!-- Main Content Area -->
+    <div class="main-content" id="mainContent">
+        <!-- Your page content goes here -->
     </div>
 
     <script>
-        // Highlight active link based on current URL
         document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileNavToggle = document.getElementById('mobileNavToggle');
+            const sidebar = document.getElementById('sidebar');
+            const body = document.body;
             
-            navLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
+            // Toggle sidebar on mobile
+            mobileNavToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                body.classList.toggle('sidebar-open');
+                
+                // Change icon
+                const icon = this.querySelector('i');
+                if (sidebar.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
                 } else {
-                    link.classList.remove('active');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
                 }
             });
             
-            // Mobile sidebar toggle functionality
-            const sidebar = document.querySelector('.sidebar');
-            if (window.innerWidth <= 768) {
-                sidebar.addEventListener('click', function() {
-                    this.classList.toggle('expanded');
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    e.target !== mobileNavToggle && 
+                    !mobileNavToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                    body.classList.remove('sidebar-open');
+                    mobileNavToggle.querySelector('i').classList.remove('fa-times');
+                    mobileNavToggle.querySelector('i').classList.add('fa-bars');
+                }
+            });
+            
+            // Highlight active link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === window.location.pathname) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Auto-close sidebar when navigating on mobile
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        body.classList.remove('sidebar-open');
+                        mobileNavToggle.querySelector('i').classList.remove('fa-times');
+                        mobileNavToggle.querySelector('i').classList.add('fa-bars');
+                    }
                 });
-            }
+            });
         });
     </script>
 </body>
