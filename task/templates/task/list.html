@@ -1,96 +1,560 @@
 <!DOCTYPE html>
- {% include "navbar.html" %} 
+{% include "navbar.html" %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List</title>
+    <title>Nexus Tasks | Premium To-Do App</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <!-- Add the Bootstrap CSS link here -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
-    <!-- Add custom CSS here -->
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --glass-effect: blur(16px);
+        }
+        
         body {
-            /* Gradient background */
-            background: linear-gradient(to right, #ff9966, #ff5e62);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            background-attachment: fixed;
         }
-        .container {
-            max-width: 960px;
-            background-color: #fff;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-        .mt-3, .my-3 {
-            margin-top: 1rem!important;
-        }
-        .btn-info {
-            color: #fff;
-            background-color: #17a2b8;
-            border-color: #17a2b8;
-        }
-        .btn-danger {
-            color: #fff;
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-        .list-group-item {
+        
+        .app-container {
+            max-width: 800px;
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-effect);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            padding: 2.5rem;
+            margin: 3rem auto;
+            overflow: hidden;
             position: relative;
-            display: block;
-            padding: 0.75rem 1.25rem;
-            margin-bottom: -1px;
-            background-color: #fff;
-            border: 1px solid rgba(0,0,0,.125);
+        }
+        
+        .app-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
+            opacity: 0.15;
+            z-index: -1;
+            animation: float 12s infinite alternate ease-in-out;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(10%, 10%); }
+        }
+        
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .app-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .app-title i {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+        
+        .user-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.15);
+        }
+        
+        .task-form {
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+        
+        .task-input {
+            border-radius: 12px !important;
+            padding: 1rem 1.25rem !important;
+            border: 2px solid #e2e8f0 !important;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
+        }
+        
+        .task-input:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+        }
+        
+        .add-btn {
+            border-radius: 12px !important;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none !important;
+            font-weight: 600;
+            padding: 1rem 2rem !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(79, 70, 229, 0.3);
+        }
+        
+        .add-btn:active {
+            transform: translateY(0);
+        }
+        
+        .add-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .add-btn:hover::after {
+            opacity: 1;
+        }
+        
+        .task-list {
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+            position: relative;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 6px rgba(15, 23, 42, 0.05);
+        }
+        
+        .task-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 6px;
+            border: 2px solid var(--gray);
+            appearance: none;
+            margin-right: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .task-checkbox:checked {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+        
+        .task-checkbox:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            color: white;
+            font-size: 0.7rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .task-content {
+            flex-grow: 1;
+            margin: 0 1rem;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        
+        .task-complete {
+            color: var(--gray);
+            text-decoration: line-through;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .task-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .task-btn i {
+            font-size: 1rem;
+        }
+        
+        .task-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .task-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .edit-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, #f97316 100%);
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+        }
+        
+        .delete-btn {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-radius: 16px;
+            background: rgba(241, 245, 249, 0.6);
+            backdrop-filter: blur(5px);
+            margin-top: 1rem;
+        }
+        
+        .empty-icon {
+            font-size: 3.5rem;
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            opacity: 0.7;
+        }
+        
+        .empty-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-text {
+            color: var(--gray);
+            max-width: 400px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .auth-section {
+            text-align: center;
+            margin-top: 2.5rem;
+        }
+        
+        .auth-link {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+        
+        .auth-link:hover {
+            color: var(--primary-dark);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        /* Floating action button for mobile */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
+            z-index: 100;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .fab:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.4);
+        }
+        
+        .fab i {
+            font-size: 1.5rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 1.5rem;
+                margin: 1.5rem;
+                border-radius: 20px;
+            }
+            
+            .app-title {
+                font-size: 1.75rem;
+            }
+            
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .task-actions {
+                align-self: flex-end;
+                margin-top: 0.5rem;
+            }
+            
+            .task-form {
+                margin-bottom: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .app-container {
+                padding: 1.25rem;
+                margin: 1rem;
+                border-radius: 16px;
+            }
+            
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .user-badge {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .empty-state {
+                padding: 2rem 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h3 class="mt-3">To-Do List</h3>
-        <form method="POST" action="">
+    <div class="app-container animate__animated animate__fadeIn">
+        <div class="app-header">
+            <h1 class="app-title">
+                <i class="fas fa-check-circle"></i>
+                Nexus Tasks
+            </h1>
+            {% if request.user.is_authenticated %}
+                <div class="user-badge animate__animated animate__fadeInRight">
+                    <i class="fas fa-user"></i>
+                    {{ request.user.username }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <form method="POST" action="" class="task-form">
             {% csrf_token %}
             {% if request.user.is_authenticated %}
-            <div class="input-group mt-3">
+            <div class="input-group">
                 {{form.title}}
-                <div class="input-group-append">
-        
-                    <button type="submit" class="btn btn-primary" name="Create Task">Create Task</button>
-                    {% endif %}
-                </div>
+                <button type="submit" class="btn btn-primary add-btn" name="Create Task">
+                    <i class="fas fa-plus me-2"></i> Add Task
+                </button>
             </div>
+            {% endif %}
         </form>
         
-        <ul class="list-group mt-3">
-            
-            
-            {% for task in tasks %}
-                <li class="list-group-item">
-                    <div>
-                        {% if request.user.is_authenticated %}
-                        <a class="btn btn-info btn-sm mr-2" href="{% url 'update_task' task.id %}">Update</a>
-                        <a class="btn btn-danger btn-sm" href="{% url 'delete' task.id %}">Delete</a>
-                        {% endif %}
-                        {% if task.complete %}
-                            <del>{{task.title}}</del>
-                        {% else %}
+        <div class="task-list">
+            {% if tasks %}
+                {% for task in tasks %}
+                    <div class="task-item" style="animation-delay: {{ forloop.counter0|add:"1" }}00ms">
+                        <input type="checkbox" class="task-checkbox" {% if task.complete %}checked{% endif %} disabled>
+                        <div class="task-content {% if task.complete %}task-complete{% endif %}">
                             {{task.title}}
+                        </div>
+                        {% if request.user.is_authenticated %}
+                        <div class="task-actions">
+                            <a href="{% url 'update_task' task.id %}" class="task-btn edit-btn">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            <a href="{% url 'delete' task.id %}" class="task-btn delete-btn">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
                         {% endif %}
                     </div>
-                </li>
-            {% endfor %}
-        </ul>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state animate__animated animate__fadeIn">
+                    <div class="empty-icon">
+                        <i class="far fa-clipboard"></i>
+                    </div>
+                    <h4 class="empty-title">Your task list is empty</h4>
+                    <p class="empty-text">Add your first task to get started on your productivity journey</p>
+                    {% if not request.user.is_authenticated %}
+                    <a href="{% url 'login' %}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login to Create Tasks
+                    </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="auth-section">
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="auth-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sign Out
+                </a>
+            {% else %}    
+                <a href="{% url 'login' %}" class="auth-link">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </a>
+            {% endif %}
+        </div>
     </div>
     
-    <div>
-        {% if request.user.is_authenticated %}
-            <h1>><a href="{% url 'logout' %}">Logout</a></h1>
-        {% else %}    
-            <h1>><a href="{% url 'login' %}">Login</a></h1>
-        {% endif %}
-    </div>
-
-    <!-- Add the Bootstrap JS and jQuery script links here (if needed) -->
+    <!-- Floating Action Button (Mobile) -->
+    {% if request.user.is_authenticated %}
+    <button class="fab animate__animated animate__bounceInUp" onclick="document.querySelector('.task-input').focus()">
+        <i class="fas fa-plus"></i>
+    </button>
+    {% endif %}
     
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Animate task items sequentially
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add ripple effect to buttons
+            const buttons = document.querySelectorAll('.add-btn, .task-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const x = e.clientX - e.target.getBoundingClientRect().left;
+                    const y = e.clientY - e.target.getBoundingClientRect().top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple-effect';
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+            
+            // Add style for ripple effect
+            const style = document.createElement('style');
+            style.textContent = `
+                .ripple-effect {
+                    position: absolute;
+                    background: rgba(255, 255, 255, 0.4);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    pointer-events: none;
+                    width: 20px;
+                    height: 20px;
+                    margin-left: -10px;
+                    margin-top: -10px;
+                }
+                
+                @keyframes ripple {
+                    to {
+                        transform: scale(10);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
 </body>
 </html>
