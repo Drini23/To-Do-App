@@ -63,7 +63,8 @@ def registerPage(request):
 def index(request):
     if request.user.is_authenticated:
         # Get tasks for the current logged in user
-        tasks = Task.objects.filter(user=request.user)
+        tasks = Task.objects.filter(user=request.user).order_by('-created')
+
     else:
         tasks = Task.objects.none()  # No tasks if user is not authenticated
 
@@ -81,23 +82,6 @@ def index(request):
     return render(request, 'task/list.html', context)
 
     
-    
-"""
-def index(request):
-    tasks = Task.objects.filter(user=request.user)
-    form = TaskForm()
-    if request.method == 'POST':
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return redirect('/')
-    context = { 'tasks': tasks, 'form': form} 
-    return render(request, 'task/list.html', context) """
-            
-        
-
-
-
 
 @login_required(login_url='login')
 def updateTask(request, pk):
