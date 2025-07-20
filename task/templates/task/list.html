@@ -548,22 +548,32 @@
             {% endif %}
         </div>
         
-        <form method="POST" action="" class="task-form">
-            {% csrf_token %}
-            {% if request.user.is_authenticated %}
-            <div class="input-group">
-                <input type="text" 
-                       name="title" 
-                       class="form-control task-input" 
-                       placeholder="What needs to be done?"
-                       aria-label="Task input"
-                       required>
-                <button type="submit" class="btn btn-primary add-btn" name="Create Task">
-                    <i class="fas fa-plus me-2"></i> Add Task
-                </button>
-            </div>
-            {% endif %}
-        </form>
+     <form method="POST" action="" class="task-form" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if request.user.is_authenticated %}
+        <div class="input-group mb-2">
+            <input type="text" 
+                   name="title" 
+                   class="form-control task-input" 
+                   placeholder="What needs to be done?"
+                   aria-label="Task input"
+                   required>
+        </div>
+
+        <div class="input-group mb-3">
+            <input type="file" 
+                   name="image" 
+                   class="form-control" 
+                   accept="image/*"
+                   aria-label="Task image (optional)">
+        </div>
+
+        <button type="submit" class="btn btn-primary add-btn" name="Create Task">
+            <i class="fas fa-plus me-2"></i> Add Task
+        </button>
+    {% endif %}
+</form>
+
         
         <div class="task-list">
             {% if tasks %}
@@ -575,7 +585,10 @@
                             <span class="task-meta">
                                 <span class="status-indicator {% if task.complete %}status-active{% else %}status-pending{% endif %}"></span>
                                 Created on {{ task.created|date:"M d, Y H:i" }}
-
+                               {% if task.image %}
+                            <br>
+                            <img src="{{ task.image.url }}" alt="Task Image" style="max-width: 200px; max-height: 150px;">
+                        {% endif %}
                             </span>
                         </div>
                         {% if request.user.is_authenticated %}

@@ -6,6 +6,11 @@ class TaskForm(forms.ModelForm):
     
     class Meta:
         model = Task
-        fields = ['title',  'complete']
+        fields = ['title',  'complete', 'image']
 
 
+class ImageTaskForm(forms.ModelForm):
+    
+    class Meta:
+        model = TaskImages
+        fields = [ 'image']

@@ -62,23 +62,21 @@ def registerPage(request):
 
 def index(request):
     if request.user.is_authenticated:
-        # Get tasks for the current logged in user
         tasks = Task.objects.filter(user=request.user).order_by('-created')
-
     else:
-        tasks = Task.objects.none()  # No tasks if user is not authenticated
+        tasks = Task.objects.none()  
 
     form = TaskForm()
 
     if request.method == 'POST':
-        form = TaskForm(request.POST)
+        form = TaskForm(request.POST, request.FILES)  # ← FIXED HERE
         if form.is_valid():
             task = form.save(commit=False)
             task.user = request.user
             task.save()
         return redirect('/')
-    
-    context = { 'tasks': tasks, 'form': form} 
+
+    context = {'tasks': tasks, 'form': form} 
     return render(request, 'task/list.html', context)
 
     
@@ -110,5 +108,3 @@ def delete(request, pk):
 def about(request):
     return render(request, 'task/about.html')
     
-
-
